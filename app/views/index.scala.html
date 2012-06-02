@@ -1,0 +1,37 @@
+@(message: String, appName: String)
+
+@main("Colorer 0.1 - Add some color to your DW!") {
+
+<div class="left-side">
+	<div class="palette-div">
+		<h1>Värit</h1>
+		<div class="color1">1</div>
+		<div class="color2">2</div>
+		<div class="color3">3</div>
+		<div class="color4">4</div>
+		<div class="color5">5</div>
+	</div>
+	<div class="operations-div">
+		<h1>Muut</h1>
+		<div class="clear">Pyyhekumi</div>
+		<div class="store">Tallenna</div>
+	</div>
+</div>
+
+<div class="tableList"></div>
+<script>
+	$(document).ready(function() {
+		onClickColor($("div.palette-div div.color1"));
+		loadData("@appName");
+	});
+    $("div.palette-div div").click(function () {
+      onClickColor($(this));
+    });
+    $("div.operations-div div.clear").click(function () {
+      onClickClear($(this));
+    });
+    $("div.operations-div div.store").click(function () {
+      onClickStore($(this));
+    });
+</script>
+}

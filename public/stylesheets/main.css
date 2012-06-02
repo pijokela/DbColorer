@@ -1,0 +1,88 @@
+body {
+	font-family: Arial, Helvetica, sans-serif;	
+}
+
+div.left-side {
+	position: fixed;
+	left: 0em;
+	top: 0em;
+	padding-top: 5em;
+	color: white;
+	height: 100%;
+	background-color: #202020;
+}
+
+span.saveTable {
+	color: #cccccc;
+	font-size: 160%;
+}
+
+.modified span.saveTable {
+	color: black;
+	font-weight: bolder; 
+}
+
+div.left-side h1 {
+	margin: 0.4em;
+	opacity:1;
+}
+
+div.left-side div div {
+	-moz-border-radius: 0.5em;
+	border-radius: 0.5em;
+	margin: 0.4em;
+}
+
+div.palette-div  div {
+	padding-top: 1em;
+	padding-bottom: 1em;
+	padding-left: 2em;
+	opacity:0.4;
+}
+
+div.palette-div div {
+	opacity:0.4;
+}	
+
+div.operations-div div {
+	opacity:1;
+	padding-left: 1em;
+	padding-top: 2em;
+	padding-bottom: 2em;
+	background-color: #505050;
+}	
+
+div#selected-color {
+	opacity: 0.9;
+}
+
+/* green */
+.color1 {
+	background-color: #00B060;
+}
+
+/* blue */
+.color2 {
+	background-color: #0A64A4;
+	color: white;
+}
+
+/* orange */
+.color3 {
+	background-color: #FF9000;	
+}
+
+/* red */
+.color4 {
+	background-color: #FF4500;
+}
+
+/* lgreen */
+.color5 {
+	background-color: #6BE400;	
+}
+
+div.tableList {
+	margin-left: 10em;
+}
+
