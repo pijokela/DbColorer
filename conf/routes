@@ -10,5 +10,7 @@ POST    /data.json                  controllers.Application.postData
 
 GET     /createTestData             controllers.Application.createTestData
 
+GET     /dynamic-javascript/:lang.js      controllers.Javascript.index(lang : String)
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

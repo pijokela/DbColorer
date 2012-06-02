@@ -1,0 +1,17 @@
+app.title=?DbColorer
+app.language=default
+
+response.dataWritten=?Data written!
+
+error.title=?Danger!
+error.message=?Reserve power supplies are failing, Commander. Auxiliary power at twenty per cent. This violates operating parameters.
+
+operations.title=?Other
+operations.eraser=?Eraser
+operations.save=?Save
+
+operations.colors=?Colors
+
+attribute.name=?Name
+attribute.type=?Type
+attribute.tables=?{0} tables

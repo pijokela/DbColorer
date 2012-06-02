@@ -1,0 +1,11 @@
+@(ex: Throwable)
+@main(Messages("app.title")) {
+<div class="left-side">
+</div>
+
+<div class="tableList">
+  <h1>@Messages("error.title")</h1>
+  <p>@Messages("error.message")</p>
+  <p>@ex.getMessage()</p>
+</div>
+}

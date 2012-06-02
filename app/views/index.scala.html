@@ -1,10 +1,9 @@
 @(message: String, appName: String)
-
-@main("Colorer 0.1 - Add some color to your DW!") {
+@main(Messages("app.title")) {
 
 <div class="left-side">
 	<div class="palette-div">
-		<h1>Värit</h1>
+		<h1>@Messages("operations.colors")</h1>
 		<div class="color1">1</div>
 		<div class="color2">2</div>
 		<div class="color3">3</div>
@@ -12,9 +11,9 @@
 		<div class="color5">5</div>
 	</div>
 	<div class="operations-div">
-		<h1>Muut</h1>
-		<div class="clear">Pyyhekumi</div>
-		<div class="store">Tallenna</div>
+		<h1>@Messages("operations.others")</h1>
+		<div class="clear">@Messages("operations.eraser")</div>
+		<div class="store">@Messages("operations.save")</div>
 	</div>
 </div>
 

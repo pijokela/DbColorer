@@ -10,6 +10,7 @@ import scala.collection.mutable.ArrayBuffer
 import play.api.libs.json.Json
 import play.api.libs.json.JsArray
 import play.api.Play._
+import org.h2.jdbc.JdbcSQLException
 
 class DbDataReader extends DataAccess {
 
@@ -50,6 +51,10 @@ class DbDataReader extends DataAccess {
   }
   
   def createTable(table : JsValue) : Unit = {
+    // Make sure that the database is created:
+    createDatabaseTables();
+    
+    // Insert data from the data.txt file:
     val tableName = (table \ "name").as[String]
     println("Writing table " + tableName)
     DB.withConnection { conn =>
@@ -62,6 +67,17 @@ class DbDataReader extends DataAccess {
         statement.execute()
       }
     }
+  }
+  
+  def createDatabaseTables() {
+    try {
+      DB.withConnection { conn =>
+        val statement = conn.prepareStatement("create table tables (table_name varchar(255), column_name varchar(255), column_type varchar(255), color_name varchar(255))")
+        statement.execute()
+      }
+    } catch {
+      case e: JdbcSQLException => println("Cannot create db, maybe it is already created? " + e.getMessage());
+	}
   }
   
   override def write(table : JsValue) : Unit = {

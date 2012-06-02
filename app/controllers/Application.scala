@@ -8,6 +8,8 @@ import services.DataAccess
 import services.testTable.TestDataReader
 import services.dbTable.DbDataReader
 import scala.collection.mutable.ArrayBuffer
+import play.api.i18n.Messages
+import play.api.i18n.Lang
 
 object Application extends Controller {
   
@@ -31,7 +33,7 @@ object Application extends Controller {
   def postData = Action(parse.json) { request =>
     println("postData")
     dbService.write(request.body)
-    Ok(Json.toJson("Data written!"))
+    Ok(Json.toJson(Messages("response.dataWritten")))
   }
   
   /*

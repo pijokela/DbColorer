@@ -1,3 +1,19 @@
+/*
+ * Format a localized String that uses parameters.
+ */
+function msg(localizedString, parameter0, parameter1, parameter2) {
+	if (parameter0 !== undefined && parameter0 !== null) {
+		localizedString = localizedString.replace('{0}', parameter0.toString());
+	}
+	if (parameter1 !== undefined && parameter0 !== null) {
+		localizedString = localizedString.replace('{1}', parameter1.toString());
+	}
+	if (parameter2 !== undefined && parameter0 !== null) {
+		localizedString = localizedString.replace('{2}', parameter2.toString());
+	}
+	return localizedString;
+}
+
 function onClickRow($row, jsonRow) {
 	$row.removeClass($row.attr("class"));
 	var color = $colorer_selected_color_div.attr("class");
@@ -22,7 +38,7 @@ function onClickClear($div) {
 
 function addTables(data) {
 	var tableArray = data.tables;
-	var $tablesDiv = $('<div><h1>Tables ' + tableArray.length + '</h2></div>');
+	var $tablesDiv = $('<div><h1>' + msg(DbColorer.msg_attribute_tables, tableArray.length) + '</h1></div>');
 	for(var i = 0; i < tableArray.length; i++) {
 		$tablesDiv.append(addTable(tableArray[i]));
 	}
@@ -30,13 +46,18 @@ function addTables(data) {
 }
 
 function addTable(table) {
-	var $saveSpan = $('<span class="saveTable" title="Tallenna">*</span>');
+	var $saveSpan = $('<span class="saveTable" title="' + DbColorer.msg_operations_save + '">*</span>');
 	$saveSpan.on('click', function () {
 	    saveJsonTable(/*$(this), */table);
 	    $(this).parents("div.colorTableDiv").removeClass("modified");
     });
 	
-	var $tableDiv = $('<div class="colorTableDiv"><h2>' + table.name + ' </h2><table class="colorTable"><thead><tr><th>Name</th><th>Type</th></tr></thead></table></div>');
+	var $tableDiv = $(
+			'<div class="colorTableDiv"><h2>' + table.name + ' </h2>' +
+			'<table class="colorTable"><thead>' + 
+			'<tr><th>' + DbColorer.msg_attribute_name + '</th>' + 
+			'<th>' + DbColorer.msg_attribute_type + '</th></tr></thead></table></div>');
+	
 	$tableDiv.find('h2').append($saveSpan);
 	var $table = $tableDiv.find('table');
 	

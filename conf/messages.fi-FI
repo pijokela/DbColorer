@@ -1,0 +1,17 @@
+app.title=DbColorer - Väritä tietokantasi (fi-FI)!
+app.language=fi-FI
+
+response.dataWritten=Tiedot tallennettu!
+
+error.title=Danger!
+error.message=Reserve power supplies are failing, Commander. Auxiliary power at twenty per cent. This violates operating parameters.
+
+operations.others=Muuta
+operations.eraser=Pyyhekumi
+operations.save=Tallenna
+
+operations.colors=Värit
+
+attribute.name=Nimi
+attribute.type=Tyyppi
+attribute.tables={0} taulua
