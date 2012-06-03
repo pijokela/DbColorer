@@ -1,5 +1,4 @@
 package services.dbTable
-import services.DataAccess
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsValue
 import play.api.Application
@@ -12,9 +11,9 @@ import play.api.libs.json.JsArray
 import play.api.Play._
 import org.h2.jdbc.JdbcSQLException
 
-class DbDataReader extends DataAccess {
+class DbDataReader {
 
-  override def read() : JsObject = {
+  def read() : JsObject = {
     
     DB.withConnection { conn =>
       val resultSet = executeSql("select table_name, column_name, column_type, color_name from tables order by table_name asc, column_name asc", conn)
@@ -70,17 +69,31 @@ class DbDataReader extends DataAccess {
   }
   
   def createDatabaseTables() {
+    createTable(
+      "create table tables (table_name varchar(255), column_name varchar(255), column_type varchar(255), color_name varchar(255))", 
+      "Cannot create table tables, maybe it is already created? "
+    )
+  }
+  
+  /**
+   * Try to run an SQL statement and report the given error message if the operation fails.
+   * Use this to make sure that the database is created before inserting test data.
+   */
+  def createTable(createTableSql : String, logErrorMessage : String) {
     try {
       DB.withConnection { conn =>
-        val statement = conn.prepareStatement("create table tables (table_name varchar(255), column_name varchar(255), column_type varchar(255), color_name varchar(255))")
+        val statement = conn.prepareStatement(createTableSql)
         statement.execute()
       }
     } catch {
-      case e: JdbcSQLException => println("Cannot create db, maybe it is already created? " + e.getMessage());
+      case e: JdbcSQLException => {
+        println(logErrorMessage)
+        println(e.getMessage())
+      }
 	}
   }
   
-  override def write(table : JsValue) : Unit = {
+  def write(table : JsValue) : Unit = {
     val tableName = (table \ "name").as[String]
     println("Updating table " + tableName)
     DB.withConnection { conn =>

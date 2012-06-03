@@ -8,9 +8,9 @@ import java.io.BufferedReader
 import scala.collection.mutable.Buffer
 import scala.collection.mutable.ArrayBuffer
 
-class TestDataReader(val fileName: String ) extends DataAccess {
+class TestDataReader(val fileName: String ) {
   
-  override def read() : JsObject = {
+  def read() : JsObject = {
     println("Reading file: " + fileName)
     val file = new File(fileName)
     val reader = new BufferedReader(new FileReader(file))
@@ -54,7 +54,7 @@ class TestDataReader(val fileName: String ) extends DataAccess {
     return result
   }
   
-  override def write(data: JsValue) : Unit = {
+  def write(data: JsValue) : Unit = {
     println("Writing! " + (data \ "name"))
   }
 }
