@@ -10,6 +10,12 @@ div.left-side {
 	color: white;
 	height: 100%;
 	background-color: #202020;
+	border-right-style: solid;
+	border-right-width: 0.2em;
+	border-right-color: #707070;
+	border-left-style: solid;
+	border-left-width: 0.3em;
+	border-left-color: #DDDDDD;
 }
 
 span.saveTable {

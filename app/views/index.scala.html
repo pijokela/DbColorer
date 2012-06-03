@@ -33,6 +33,8 @@
 	$(document).ready(function() {
 		onClickColor($("div.palette-div div.color1"));
 		loadData("@appName");
+	    var $tags = $("div.tag")
+	    $tags.draggable();
 	});
     $("div.palette-div div").click(function () {
       onClickColor($(this));

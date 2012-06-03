@@ -55,7 +55,7 @@ class DbDataReader {
 	          "tags" -> tags
 	        )
 	      )
-	      table.cols.+=(col)
+	      table.cols += col
       }
       
       val result = new JsObject(List("tables" -> 
@@ -65,6 +65,51 @@ class DbDataReader {
     }
   }
   
+  def write(table : JsValue) : Unit = {
+    val tableName = (table \ "name").as[String]
+    println("Updating table " + tableName)
+    DB.withConnection { conn =>
+      val cols = (table \ "columns").asInstanceOf[JsArray].productIterator.next().asInstanceOf[Iterable[JsObject]]
+      for(column <- cols) {
+        updateColumn(column, conn)
+      }
+    }
+  }
+
+  def readTags() : JsObject = {
+    
+    val tags = new ArrayBuffer[JsObject]()
+    DB.withConnection { conn =>
+      val resultSet = executeSql("select tag_name from tags tag_name asc", conn)
+      while (resultSet.next()) {
+        val tagName = resultSet.getString(1)
+       
+	    val tag = new JsObject(
+	      List(
+	        "id" -> Json.toJson(tagName),
+	        "name" -> Json.toJson(tagName)
+	      )
+	    )
+        tags += tag
+      }
+    }
+    
+    val result = new JsObject(List("tags" -> new JsArray(tags)))
+    println("Result ready.")
+    return result
+  }
+  
+  def writeTags(table : JsValue) : Unit = {
+/*    val tableName = (table \ "tag").as[String]
+    println("Updating table " + tableName)
+    DB.withConnection { conn =>
+      val cols = (table \ "columns").asInstanceOf[JsArray].productIterator.next().asInstanceOf[Iterable[JsObject]]
+      for(column <- cols) {
+        updateColumn(column, conn)
+      }
+    }*/
+  }
+
   def createTable(table : JsValue) : Unit = {
     // Make sure that the database is created:
     createDatabaseTables();
@@ -82,12 +127,24 @@ class DbDataReader {
         statement.execute()
       }
     }
+    
+    // Insert test tags
+    DB.withConnection { conn =>
+      for(tag <- List("foo", "bar", "baz")) {
+        val statement = conn.prepareStatement("INSERT INTO TAGS VALUES('" + tag + "')")
+        statement.execute()
+      }
+    }
   }
   
   def createDatabaseTables() {
     createTable(
       "create table tables (table_name varchar(255), column_name varchar(255), column_type varchar(255), color_name varchar(255), tags varchar(2000))", 
       "Cannot create table tables, maybe it is already created? "
+    )
+    createTable(
+      "create table tags (tag_name varchar(255))", 
+      "Cannot create table tags, maybe it is already created? "
     )
   }
   
@@ -107,17 +164,6 @@ class DbDataReader {
         println(e.getMessage())
       }
 	}
-  }
-  
-  def write(table : JsValue) : Unit = {
-    val tableName = (table \ "name").as[String]
-    println("Updating table " + tableName)
-    DB.withConnection { conn =>
-      val cols = (table \ "columns").asInstanceOf[JsArray].productIterator.next().asInstanceOf[Iterable[JsObject]]
-      for(column <- cols) {
-        updateColumn(column, conn)
-      }
-    }
   }
   
   def updateColumn(col : JsObject, conn : Connection) {

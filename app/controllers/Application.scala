@@ -22,16 +22,25 @@ object Application extends Controller {
   /*
    * The JSON sent to the browser contains an array of tables.
    */
-  def getData = Action {
+  def getTables = Action {
     Ok(dbService.read())
   }
-  
+
   /*
    * The JSON must contain data for 1 table.
    */
-  def postData = Action(parse.json) { request =>
+  def postTables = Action(parse.json) { request =>
     println("postData")
     dbService.write(request.body)
+    Ok(Json.toJson(Messages("response.dataWritten")))
+  }
+  
+  def getTags = Action {
+    Ok(dbService.readTags())
+  }
+
+  def postTags = Action(parse.json) { request =>
+    dbService.writeTags(request.body)
     Ok(Json.toJson(Messages("response.dataWritten")))
   }
   

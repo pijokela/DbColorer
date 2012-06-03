@@ -7,12 +7,14 @@
     <head>
         <title>@title</title>
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
+        <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" media="screen" rel="stylesheet" type="text/css"/>
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
         @* The idea here is to get the name of the language in to the request path. 
          * Why cannot I just get the language name from Messages? 
          *@
         <script src="/dynamic-javascript/@(Messages("app.language")).js" type="text/javascript"></script>
         <script src="@routes.Assets.at("javascripts/jquery-1.7.1.min.js")" type="text/javascript"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
         <script src="@routes.Assets.at("javascripts/colorer.js")" type="text/javascript"></script>
     </head>
     <body>

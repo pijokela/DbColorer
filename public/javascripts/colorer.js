@@ -67,25 +67,48 @@ function addTable(table) {
 		var $colDiv = $('<div id="' + col.id + '" class="column ' + col.color + '">' + col.name + ' <span class="columnType">' + col.type + '</span></div>')
 		$colDiv.append(createMenuIcon(col));
 		
-		$colDiv.append($('<span class="columnTag">useless</span>'));
-		$colDiv.append($('<span class="columnTag">super</span>'));
-		$colDiv.append($('<span class="columnTag">DW</span>'));
-		
-		var tagsArray = col.tags;
-		for(var j = 0; j < tagsArray.length; j++) {
-			var tag = tagsArray[i];
-			$colDiv.append($('<span class="columnTag">' + tag + '</span>'));
-		}
+		addTagsFromColumnToColDiv(col, $colDiv);
 		
 		$colDiv.on('click', (function(column) {
 			return function() {
 				onClickRow($(this), column);
 			};
 		})(col));
+		$colDiv.droppable({
+			   drop: (function(column) {
+			     return function(event, ui) {
+			    	addTagToColumn($(this), column, ui.draggable); // ui.draggable is the dragged tag
+			    	// Reset the draggable back to it's place:
+			    	ui.draggable.attr("style", "position: relative;");
+			     }
+			   })(col)
+		});
 		$tr.find('td').append($colDiv);
 		$table.append($tr);
 	}
 	return $tableDiv;
+}
+
+function addTagToColumn($colDiv, column, $tag) {
+	column.tags.push($tag.html());
+	unique(column.tags, stringCompareFunc);
+	$colDiv.find("span.columnTag").remove();
+	addTagsFromColumnToColDiv(column, $colDiv)
+}
+
+function addTagsFromColumnToColDiv(col, $colDiv) {
+	var tagsArray = col.tags;
+	for(var j = 0; j < tagsArray.length; j++) {
+		var tag = tagsArray[j];
+		addTagSpanToColumnDiv(tag/*.name()*/, $colDiv);
+	}
+}
+
+function addTagSpanToColumnDiv(tagName, $colDiv) {
+	 console.log("4");
+	var $tag = $('<span class="columnTag">' + tagName + '</span>');
+	$tag.draggable();
+	$colDiv.append($tag);
 }
 
 /*
@@ -149,4 +172,25 @@ function postJson(url, jsonData, completeCallback, responseType) {
 			dataType: responseType
 		}
 	);
+}
+
+/* 
+ * Array unique function from StackOverflow.
+ * Provide your own comparison
+ */
+function unique(a, compareFunc){
+    a.sort( compareFunc );
+    for(var i = 1; i < a.length; ){
+        if( compareFunc(a[i-1], a[i]) === 0){
+            a.splice(i, 1);
+        } else {
+            i++;
+        }
+    }
+    return a;
+}
+
+function stringCompareFunc(s1, s2) {
+  if (s1 === s2) return 0;
+  return (s1 < s2) ? 1 : -1;
 }

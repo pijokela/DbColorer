@@ -5,8 +5,11 @@
 # Home page
 GET     /                           controllers.Application.index
 
-GET     /data.json                  controllers.Application.getData
-POST    /data.json                  controllers.Application.postData
+GET     /data.json                  controllers.Application.getTables
+POST    /data.json                  controllers.Application.postTables
+
+GET     /tags.json                  controllers.Application.getTags
+POST    /tags.json                  controllers.Application.postTags
 
 GET     /createTestData             controllers.Application.createTestData
 
