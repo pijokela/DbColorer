@@ -11,13 +11,25 @@ import play.api.libs.json.JsArray
 import play.api.Play._
 import org.h2.jdbc.JdbcSQLException
 
+/**
+ * Tables and columns have id attributes that are their unique ids.
+ * The rest of DbColorer should use them only as that. This data
+ * access class must also manipulate them and currently they are
+ * created from table and column names.
+ */
 class DbDataReader {
 
+  /**
+   * Parse a String to a JsArray allowing for empty strings.
+   */
+  def parseTags(str : String) : JsArray = {
+    if (str == null || str.length() == 0) return new JsArray(Nil)
+    return Json.parse(str).asInstanceOf[JsArray]
+  }
+  
   def read() : JsObject = {
     
     DB.withConnection { conn =>
-      val resultSet = executeSql("select table_name, column_name, column_type, color_name from tables order by table_name asc, column_name asc", conn)
-      
       val tables = new ArrayBuffer[Table]()
       def createAndAdd(name : String) : Table = {
         val t = new Table(name)
@@ -25,18 +37,22 @@ class DbDataReader {
         return t
       }
       
+      val resultSet = executeSql("select table_name, column_name, column_type, color_name, tags from tables order by table_name asc, column_name asc", conn)
       while (resultSet.next()) {
         val tableName = resultSet.getString(1)
         val columnName = resultSet.getString(2)
         val columnType = resultSet.getString(3)
         val colorName = resultSet.getString(4)
+        val tags : JsArray = parseTags(resultSet.getString(5))
         
 	    val table : Table = tables.find(_.name == tableName).getOrElse(createAndAdd(tableName))
 	    val col = new JsObject(
 	        List(
+	          "id" -> Json.toJson(tableName + ":" + columnName),
 	          "name" -> Json.toJson(columnName),
 	          "type" -> Json.toJson(columnType),
-	          "color" -> Json.toJson(colorName)
+	          "color" -> Json.toJson(colorName),
+	          "tags" -> tags
 	        )
 	      )
 	      table.cols.+=(col)
@@ -62,7 +78,7 @@ class DbDataReader {
         val colName = (column \ "name").as[String]
         val colType = (column \ "type").as[String]
         val color = (column \ "color").as[String]
-        val statement = conn.prepareStatement("INSERT INTO TABLES VALUES('" + tableName + "', '" + colName + "', '" + colType + "', '" + color + "')")
+        val statement = conn.prepareStatement("INSERT INTO TABLES VALUES('" + tableName + "', '" + colName + "', '" + colType + "', '" + color + "', '')")
         statement.execute()
       }
     }
@@ -70,7 +86,7 @@ class DbDataReader {
   
   def createDatabaseTables() {
     createTable(
-      "create table tables (table_name varchar(255), column_name varchar(255), column_type varchar(255), color_name varchar(255))", 
+      "create table tables (table_name varchar(255), column_name varchar(255), column_type varchar(255), color_name varchar(255), tags varchar(2000))", 
       "Cannot create table tables, maybe it is already created? "
     )
   }
@@ -99,14 +115,17 @@ class DbDataReader {
     DB.withConnection { conn =>
       val cols = (table \ "columns").asInstanceOf[JsArray].productIterator.next().asInstanceOf[Iterable[JsObject]]
       for(column <- cols) {
-        val colName = (column \ "name").as[String]
-        val colType = (column \ "type").as[String]
-        val color = (column \ "color").as[String]
-        println("Update col " + colName + " to color " + color)
-        val statement = conn.prepareStatement("UPDATE TABLES SET color_name = '" + color + "' WHERE TABLE_NAME = '" + tableName + "' AND COLUMN_NAME = '" + colName + "'")
-        statement.execute()
+        updateColumn(column, conn)
       }
     }
+  }
+  
+  def updateColumn(col : JsObject, conn : Connection) {
+    val colId = (col \ "id").as[String]
+    val color = (col \ "color").as[String]
+    val tagsArray = (col \ "tags").asInstanceOf[JsArray]
+    val tags = Json.stringify(tagsArray)
+    updateColumn(conn, colId, color, tags)
   }
   
   private def executeSql(sql : String, conn : Connection) : ResultSet = {
@@ -117,6 +136,17 @@ class DbDataReader {
       throw new RuntimeException("Select statement did not return a result set.")
     }
   }
+  
+  private def updateColumn(conn: java.sql.Connection, colId: String, color: String, tags: String): Unit = {
+    println("Update col " + colId + " to color " + color)
+    val statement = conn.prepareStatement("UPDATE TABLES SET color_name = ?, tags = ? WHERE TABLE_NAME = ? AND COLUMN_NAME = ?")
+    statement.setString(1, color)
+    statement.setString(2, tags)
+    statement.setString(3, colId.split(":")(0))
+    statement.setString(4, colId.split(":")(1))
+    val result = statement.executeUpdate()
+    print(result + " ")
+  }
 }
   
 class Table(val name : String) {
@@ -124,6 +154,7 @@ class Table(val name : String) {
   
   def toJson() : JsValue = {
     new JsObject(List(
+        "id" -> Json.toJson(name),
         "name" -> Json.toJson(name),
         "columns" -> new JsArray(cols)
       )

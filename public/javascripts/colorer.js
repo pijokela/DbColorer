@@ -17,6 +17,7 @@ function msg(localizedString, parameter0, parameter1, parameter2) {
 function onClickRow($row, jsonRow) {
 	$row.removeClass($row.attr("class"));
 	var color = $colorer_selected_color_div.attr("class");
+	$row.addClass("column");
 	$row.addClass(color);
 	jsonRow.color = color;
 	
@@ -48,15 +49,13 @@ function addTables(data) {
 function addTable(table) {
 	var $saveSpan = $('<span class="saveTable" title="' + DbColorer.msg_operations_save + '">*</span>');
 	$saveSpan.on('click', function () {
-	    saveJsonTable(/*$(this), */table);
+	    saveJsonTable(table);
 	    $(this).parents("div.colorTableDiv").removeClass("modified");
     });
 	
 	var $tableDiv = $(
-			'<div class="colorTableDiv"><h2>' + table.name + ' </h2>' +
-			'<table class="colorTable"><thead>' + 
-			'<tr><th>' + DbColorer.msg_attribute_name + '</th>' + 
-			'<th>' + DbColorer.msg_attribute_type + '</th></tr></thead></table></div>');
+			'<div id="' + table.id + '" class="colorTableDiv"><A name="' + table.id + '"><h2>' + table.name + ' </h2></a>' +
+			'<table class="colorTable"></table></div>');
 	
 	$tableDiv.find('h2').append($saveSpan);
 	var $table = $tableDiv.find('table');
@@ -64,15 +63,45 @@ function addTable(table) {
 	var colArray = table.columns;
 	for(var i = 0; i < colArray.length; i++) {
 		var col = colArray[i];
-		var $tr = $('<tr class="' + col.color + '"><td>' + col.name + '</td><td>' + col.type + '</td></tr>');
-		$tr.on('click', (function(column) {
+		var $tr = $('<tr><td></td></tr>');
+		var $colDiv = $('<div id="' + col.id + '" class="column ' + col.color + '">' + col.name + ' <span class="columnType">' + col.type + '</span></div>')
+		$colDiv.append(createMenuIcon(col));
+		
+		$colDiv.append($('<span class="columnTag">useless</span>'));
+		$colDiv.append($('<span class="columnTag">super</span>'));
+		$colDiv.append($('<span class="columnTag">DW</span>'));
+		
+		var tagsArray = col.tags;
+		for(var j = 0; j < tagsArray.length; j++) {
+			var tag = tagsArray[i];
+			$colDiv.append($('<span class="columnTag">' + tag + '</span>'));
+		}
+		
+		$colDiv.on('click', (function(column) {
 			return function() {
 				onClickRow($(this), column);
 			};
 		})(col));
+		$tr.find('td').append($colDiv);
 		$table.append($tr);
 	}
 	return $tableDiv;
+}
+
+/*
+ * Creates an icon that opens the column menu.
+ * 
+ * @param col The column JSON object.
+ * @returns A JQuery img tag.
+ */
+function createMenuIcon(col) {
+	var $icon = $('<img class="icon" src="/assets/images/ratas.png">');
+	$icon.on('click', (function(column) {
+		return function() {
+			showMenu($(this), column);
+		};
+	})(col));
+	return $icon;
 }
 
 function loadData(appName) {

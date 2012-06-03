@@ -9,8 +9,9 @@ error.message=?Reserve power supplies are failing, Commander. Auxiliary power at
 operations.title=?Other
 operations.eraser=?Eraser
 operations.save=?Save
-
 operations.colors=?Colors
+operations.tags=?Tags
+operations.createTag=?New Tag
 
 attribute.name=?Name
 attribute.type=?Type

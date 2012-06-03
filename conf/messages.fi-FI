@@ -9,8 +9,9 @@ error.message=Reserve power supplies are failing, Commander. Auxiliary power at 
 operations.others=Muuta
 operations.eraser=Pyyhekumi
 operations.save=Tallenna
-
 operations.colors=Värit
+operations.tags=Merkit
+operations.createTag=Uusi merkki
 
 attribute.name=Nimi
 attribute.type=Tyyppi

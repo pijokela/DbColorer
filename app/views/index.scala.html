@@ -2,7 +2,7 @@
 @main(Messages("app.title")) {
 
 <div class="left-side">
-	<div class="palette-div">
+	<div class="tools palette-div">
 		<h1>@Messages("operations.colors")</h1>
 		<div class="color1">1</div>
 		<div class="color2">2</div>
@@ -10,7 +10,18 @@
 		<div class="color4">4</div>
 		<div class="color5">5</div>
 	</div>
-	<div class="operations-div">
+	<div class="tags-div">
+		<h1>@Messages("operations.tags")</h1>
+		<div class="tag">foo</div>
+		<div class="tag">bar</div>
+		<div class="tag">baz</div>
+		@* This little kludge keeps the tags from overflowing the buttons: *@
+		<div style="clear: both"></div>
+	</div>
+	<div class="tools operations-div">
+		<div class="createTag">@Messages("operations.createTag")</div>
+	</div>
+	<div class="tools operations-div">
 		<h1>@Messages("operations.others")</h1>
 		<div class="clear">@Messages("operations.eraser")</div>
 		<div class="store">@Messages("operations.save")</div>
