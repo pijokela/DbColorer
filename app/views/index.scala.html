@@ -12,9 +12,6 @@
 	</div>
 	<div class="tags-div">
 		<h1>@Messages("operations.tags")</h1>
-		<div class="tag">foo</div>
-		<div class="tag">bar</div>
-		<div class="tag">baz</div>
 		@* This little kludge keeps the tags from overflowing the buttons: *@
 		<div style="clear: both"></div>
 	</div>
@@ -32,9 +29,8 @@
 <script>
 	$(document).ready(function() {
 		onClickColor($("div.palette-div div.color1"));
+		loadTags("@appName");
 		loadData("@appName");
-	    var $tags = $("div.tag")
-	    $tags.draggable();
 	});
     $("div.palette-div div").click(function () {
       onClickColor($(this));

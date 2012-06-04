@@ -21,10 +21,24 @@ class DbDataReader {
 
   /**
    * Parse a String to a JsArray allowing for empty strings.
+   * Each column stores the tag ids in a single varchar.
    */
   def parseTags(str : String) : JsArray = {
-    if (str == null || str.length() == 0) return new JsArray(Nil)
-    return Json.parse(str).asInstanceOf[JsArray]
+    if (str == null) return new JsArray(Nil)
+    val jsTags = for(strTag <- str.split(" ") if !strTag.trim.isEmpty()) 
+      yield readTag(strTag)
+    return new JsArray(jsTags.toList)
+  }
+  
+  /**
+   * Create a tag id string for a column.
+   */
+  def writeTagIdString(tagsArray : JsArray) : String = {
+    if (tagsArray == null) return ""
+    val tags = tagsArray.productIterator.next().asInstanceOf[Iterable[JsObject]]
+    val tagIds = for(tagObj <- tags) 
+      yield (tagObj \ "id").as[String]
+    return tagIds.mkString(" ")
   }
   
   def read() : JsObject = {
@@ -58,9 +72,10 @@ class DbDataReader {
 	      table.cols += col
       }
       
+      val jsonObjects = tables.map(_.toJson())
       val result = new JsObject(List("tables" -> 
-        new JsArray(tables.map(_.toJson()))))
-      println("Result ready.")
+        new JsArray(jsonObjects)))
+      println("Result ready: " + jsonObjects.size + " tables sent.")
       return result
     }
   }
@@ -76,11 +91,14 @@ class DbDataReader {
     }
   }
 
+  /**
+   * Reads a list of all the tags in the system. Use this for creating the user interface.
+   */
   def readTags() : JsObject = {
     
     val tags = new ArrayBuffer[JsObject]()
     DB.withConnection { conn =>
-      val resultSet = executeSql("select tag_name from tags tag_name asc", conn)
+      val resultSet = executeSql("select tag_name from tags order by tag_name asc", conn)
       while (resultSet.next()) {
         val tagName = resultSet.getString(1)
        
@@ -95,8 +113,22 @@ class DbDataReader {
     }
     
     val result = new JsObject(List("tags" -> new JsArray(tags)))
-    println("Result ready.")
+    println("Result ready: " + tags.size + " tags sent.")
     return result
+  }
+  
+  /**
+   * Reads a single tag from the database given the tag id.
+   */
+  def readTag(tagId : String) : JsObject = {
+    // This is a cheat implementation, but for now, it'll do.
+    val tag = new JsObject(
+      List(
+        "id" -> Json.toJson(tagId),
+        "name" -> Json.toJson(tagId)
+      )
+    )
+    return tag
   }
   
   def writeTags(table : JsValue) : Unit = {
@@ -112,7 +144,8 @@ class DbDataReader {
 
   def createTable(table : JsValue) : Unit = {
     // Make sure that the database is created:
-    createDatabaseTables();
+    dropDatabaseTables()
+    createDatabaseTables()
     
     // Insert data from the data.txt file:
     val tableName = (table \ "name").as[String]
@@ -135,6 +168,17 @@ class DbDataReader {
         statement.execute()
       }
     }
+  }
+  
+  def dropDatabaseTables() {
+    createTable(
+      "drop table tables", 
+      "Cannot drop table tables, maybe it is already dropped? "
+    )
+    createTable(
+      "drop table tags", 
+      "Cannot drop table tags, maybe it is already dropped? "
+    )
   }
   
   def createDatabaseTables() {
@@ -170,7 +214,7 @@ class DbDataReader {
     val colId = (col \ "id").as[String]
     val color = (col \ "color").as[String]
     val tagsArray = (col \ "tags").asInstanceOf[JsArray]
-    val tags = Json.stringify(tagsArray)
+    val tags = writeTagIdString(tagsArray)
     updateColumn(conn, colId, color, tags)
   }
   

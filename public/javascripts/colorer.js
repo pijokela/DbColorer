@@ -46,6 +46,19 @@ function addTables(data) {
 	$("div.tableList").append($tablesDiv);
 }
 
+/*
+ * Adds tags to the left side toolbar
+ */
+function addTags(tags) {
+	var tagsArray = tags.tags;
+	var $tagsHeading = $('div.tags-div h1');
+	for(var i = 0; i < tagsArray.length; i++) {
+		var tag = tagsArray[i];
+		var $tag = createTagElement(tag);
+		$tagsHeading.after($tag);
+	}
+}
+
 function addTable(table) {
 	var $saveSpan = $('<span class="saveTable" title="' + DbColorer.msg_operations_save + '">*</span>');
 	$saveSpan.on('click', function () {
@@ -89,10 +102,21 @@ function addTable(table) {
 	return $tableDiv;
 }
 
+/*
+ * After a tag is dragged over a column this function adds the tag to the column.
+ * 
+ * @param $colDiv The column div that gets the tag.
+ * @param column The column JSON that get the tag JSON.
+ * @param $tag The tag span.
+ */
 function addTagToColumn($colDiv, column, $tag) {
-	column.tags.push($tag.html());
-	unique(column.tags, stringCompareFunc);
-	$colDiv.find("span.columnTag").remove();
+	var tag = {
+		id: $tag.html(),
+		name: $tag.html()
+	};
+	column.tags.push(tag);
+	unique(column.tags, tagCompareFunc);
+	$colDiv.find("span.tag").remove();
 	addTagsFromColumnToColDiv(column, $colDiv)
 }
 
@@ -100,15 +124,15 @@ function addTagsFromColumnToColDiv(col, $colDiv) {
 	var tagsArray = col.tags;
 	for(var j = 0; j < tagsArray.length; j++) {
 		var tag = tagsArray[j];
-		addTagSpanToColumnDiv(tag/*.name()*/, $colDiv);
+		var $tag = createTagElement(tag);
+		$colDiv.append($tag);
 	}
 }
 
-function addTagSpanToColumnDiv(tagName, $colDiv) {
-	 console.log("4");
-	var $tag = $('<span class="columnTag">' + tagName + '</span>');
+function createTagElement(tag) {
+	var $tag = $('<span class="tag">' + tag.name + '</span>');
 	$tag.draggable();
-	$colDiv.append($tag);
+	return $tag;
 }
 
 /*
@@ -135,6 +159,17 @@ function loadData(appName) {
 	  // Stored to a global:
 	  colorer_data = data;
 	  colorer_appName = appName;
+	}, "json")
+	.error(function(jqXHR, textStatus, errorThrown) { alert("error: " + textStatus); });
+}
+
+function loadTags(appName) {
+	// Assign handlers immediately after making the request,
+	// and remember the jqxhr object for this request
+	var jqxhr = $.get("/tags.json?appName=" + appName, function(tags) {
+	  addTags(tags);
+	  // Stored to a global:
+	  colorer_tags = tags;
 	}, "json")
 	.error(function(jqXHR, textStatus, errorThrown) { alert("error: " + textStatus); });
 }
@@ -193,4 +228,8 @@ function unique(a, compareFunc){
 function stringCompareFunc(s1, s2) {
   if (s1 === s2) return 0;
   return (s1 < s2) ? 1 : -1;
+}
+
+function tagCompareFunc(t1, t2) {
+  return stringCompareFunc(t1.id, t2.id);
 }
