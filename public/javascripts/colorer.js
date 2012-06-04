@@ -14,13 +14,30 @@ function msg(localizedString, parameter0, parameter1, parameter2) {
 	return localizedString;
 }
 
-function onClickRow($row, jsonRow) {
+function onClickRow($row, column) {
 	$row.removeClass($row.attr("class"));
 	var color = $colorer_selected_color_div.attr("class");
 	$row.addClass("column");
 	$row.addClass(color);
-	jsonRow.color = color;
+	column.color = color;
 	
+	markModified($row, column);
+}
+
+function onClickTag($tag, column) {
+	var color = $colorer_selected_color_div.attr("class");
+	if (color === "clear") {
+		removeTagFromColumn($tag, column)
+		markModified($tag.parent(), jsonRow)
+		return true;
+	}
+	return false;
+}
+
+/*
+ * Marks the table modified in the UI and data structure.
+ */
+function markModified($row, jsonRow) {
 	var $tableDiv = $row.parents("div.colorTableDiv");
 	$tableDiv.addClass("modified");
 }
@@ -62,8 +79,7 @@ function addTags(tags) {
 function addTable(table) {
 	var $saveSpan = $('<span class="saveTable" title="' + DbColorer.msg_operations_save + '">*</span>');
 	$saveSpan.on('click', function () {
-	    saveJsonTable(table);
-	    $(this).parents("div.colorTableDiv").removeClass("modified");
+	    saveJsonColorTable(table);
     });
 	
 	var $tableDiv = $(
@@ -93,6 +109,7 @@ function addTable(table) {
 			    	addTagToColumn($(this), column, ui.draggable); // ui.draggable is the dragged tag
 			    	// Reset the draggable back to it's place:
 			    	ui.draggable.attr("style", "position: relative;");
+			    	markModified($(this), column);
 			     }
 			   })(col)
 		});
@@ -110,14 +127,36 @@ function addTable(table) {
  * @param $tag The tag span.
  */
 function addTagToColumn($colDiv, column, $tag) {
-	var tag = {
-		id: $tag.html(),
-		name: $tag.html()
-	};
+	var tag = getTagForTagSpan($tag);
 	column.tags.push(tag);
 	unique(column.tags, tagCompareFunc);
 	$colDiv.find("span.tag").remove();
 	addTagsFromColumnToColDiv(column, $colDiv)
+}
+
+function getTagForTagSpan($tag) {
+	// TODO: This really should get the tag from the gloval variable so 
+	// that tags can contain more information.
+	var tag = {
+			id: $tag.html(),
+			name: $tag.html()
+		};
+	return tag;
+}
+
+/*
+ * Removes tag from data structure and UI.
+ */
+function removeTagFromColumn($tag, column) {
+	var tag = getTagForTagSpan($tag);
+	for(var i = 0; i < column.tags.length; i++) {
+		var t = column.tags[i];
+		if (t.id === tag.id) {
+			column.tags.splice(i, 1);
+			break;
+		}
+	}
+	$tag.remove();
 }
 
 function addTagsFromColumnToColDiv(col, $colDiv) {
@@ -126,6 +165,13 @@ function addTagsFromColumnToColDiv(col, $colDiv) {
 		var tag = tagsArray[j];
 		var $tag = createTagElement(tag);
 		$colDiv.append($tag);
+		$tag.on('click', (function(column) {
+			return function(event) {
+				if (onClickTag($(this), column)) {
+					event.stopPropagation();
+				}
+			};
+		})(col));
 	}
 }
 
@@ -175,21 +221,22 @@ function loadTags(appName) {
 }
 
 function onClickStore($div) {
-	alert("Store!");
-	
 	var tableArray = colorer_data.tables;
-	for(var i = 0; i < 10; i++) {
+	for(var i = 0; i < tableArray.length; i++) {
 		var table = tableArray[i];
-		saveJsonTable(table);
+		saveJsonColorTable(table);
 	}
 }
 
-function saveJsonTable(table) {
+function saveJsonColorTable(table) {
 	var jqxhr = postJson("/data.json?appName=" + colorer_appName, table, function(data) {
 	}, "json")
 	.error(function(jqXHR, textStatus, errorThrown) { 
 		alert("error: " + textStatus + " on table " + table.name); 
 	});
+	
+	$tableDiv = $("div#" + table.id);
+    $tableDiv.removeClass("modified");
 }
 
 /*
