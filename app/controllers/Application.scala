@@ -48,11 +48,13 @@ object Application extends Controller {
    * The JSON must contain data for 1 table.
    */
   def createTestData = Action {
-    val tablesObj = testDataService.read()
-    val tablesArray : JsArray = (tablesObj \ "tables").asInstanceOf[JsArray]
-    val it : ArrayBuffer[JsObject] = tablesArray.productIterator.next().asInstanceOf[ArrayBuffer[JsObject]]
-    it.foreach(
-        (v : JsObject) => dbService.createTable(v)
+    // Make sure that the database is created:
+    dbService.dropDatabaseTables()
+    dbService.createDatabaseTables()
+    
+    val tables: List[JsValue] = testDataService.read()
+    tables.foreach (
+        (v : JsValue) => dbService.createTable(v)
     )
     
     Ok(Json.toJson("Data written to database!"))

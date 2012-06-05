@@ -38,3 +38,9 @@ TOAD_PLAN_TABLE                TIMESTAMP                      DATE              
 TOAD_PLAN_TABLE                REMARKS                        VARCHAR2                                                                                                   color3
 TOAD_PLAN_TABLE                OPERATION                      VARCHAR2                                                                                                   color3
 TOAD_PLAN_TABLE                OPTIONS                        VARCHAR2                                                                                                   color3
+TABLES                         TABLE_NAME                     VARCHAR2                                                                                                   color2
+TABLES                         COLUMN_NAME                    VARCHAR2                                                                                                   color2
+TABLES                         COLUMN_TYPE                    VARCHAR2                                                                                                   color2
+TABLES                         COLOR_NAME                     VARCHAR2                                                                                                   color2
+TABLES                         TAGS                           VARCHAR2                                                                                                   color2
+TAGS                           TAG_NAME                       VARCHAR2                                                                                                   color2

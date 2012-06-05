@@ -63,6 +63,16 @@ function addTables(data) {
 	$("div.tableList").append($tablesDiv);
 }
 
+function findJsonTable($tableDiv) {
+	var id = $tableDiv.attr("id");
+	var tableArray = colorer_tables.tables;
+	for(var i = 0; i < tableArray.length; i++) {
+		if (id === tableArray[i].id) {
+			return tableArray[i];
+		}
+	}
+}
+
 /*
  * Adds tags to the left side toolbar
  */
@@ -203,7 +213,7 @@ function loadData(appName) {
 	var jqxhr = $.get("/data.json?appName=" + appName, function(data) {
 	  addTables(data);
 	  // Stored to a global:
-	  colorer_data = data;
+	  colorer_tables = data;
 	  colorer_appName = appName;
 	}, "json")
 	.error(function(jqXHR, textStatus, errorThrown) { alert("error: " + textStatus); });
@@ -221,7 +231,7 @@ function loadTags(appName) {
 }
 
 function onClickStore($div) {
-	var tableArray = colorer_data.tables;
+	var tableArray = colorer_tables.tables;
 	for(var i = 0; i < tableArray.length; i++) {
 		var table = tableArray[i];
 		saveJsonColorTable(table);
@@ -238,6 +248,44 @@ function saveJsonColorTable(table) {
 	$tableDiv = $("div#" + table.id);
     $tableDiv.removeClass("modified");
 }
+
+function onClickInLineOrganization($imageElement) {
+	$("div.colorTableDiv").each(function (i) {
+		storeTablePositionToJsonTable($(this));
+		$(this).draggable("destroy");
+		$(this).attr("style", "");
+	});
+	
+	$(".table-organization img").removeClass("not-visible");
+	$imageElement.addClass("not-visible");
+}
+
+function onClickOrganizableOrganization($imageElement) {
+	$("div.colorTableDiv").each(function (i) {
+		$(this).draggable({ handle: "h2" });
+		$(this).draggable({
+			stop: function(event, ui) {
+				storeTablePositionToJsonTable($(this));
+			}
+		});
+		loadTablePositionToJsonTable($(this));
+	});
+	
+	$(".table-organization img").removeClass("not-visible");
+	$imageElement.addClass("not-visible");
+}
+
+function storeTablePositionToJsonTable($tableDiv) {
+	var table = findJsonTable($tableDiv);
+	table.style = $tableDiv.attr("style");
+}
+
+function loadTablePositionToJsonTable($tableDiv) {
+	var table = findJsonTable($tableDiv);
+	if (table.style !== undefined && table.style !== null)
+		$tableDiv.attr("style", table.style);
+}
+
 
 /*
  * Does jQuery ajax post so that Play! will handle the request correctly.

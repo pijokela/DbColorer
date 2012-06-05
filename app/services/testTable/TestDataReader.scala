@@ -10,7 +10,7 @@ import scala.collection.mutable.ArrayBuffer
 
 class TestDataReader(val fileName: String ) {
   
-  def read() : JsObject = {
+  def read() : List[JsValue] = {
     println("Reading file: " + fileName)
     val file = new File(fileName)
     val reader = new BufferedReader(new FileReader(file))
@@ -48,10 +48,7 @@ class TestDataReader(val fileName: String ) {
       line = reader.readLine()
     }
     
-    val result = new JsObject(List("tables" -> 
-      new JsArray(tables.map(_.toJson()))))
-    println("Result ready.")
-    return result
+    return tables.map(_.toJson()).toList
   }
   
   def write(data: JsValue) : Unit = {

@@ -25,7 +25,12 @@
 	</div>
 </div>
 
-<div class="tableList"></div>
+<div class="tableList">
+	<div class="table-organization">
+	  <img class="in-list not-visible" src='@routes.Assets.at("images/tables-in-list.png")'>
+	  <img class="organizable" src='@routes.Assets.at("images/tables-draggable.png")'>
+	</div>
+</div>
 <script>
 	$(document).ready(function() {
 		onClickColor($("div.palette-div div.color1"));
@@ -40,6 +45,12 @@
     });
     $("div.operations-div div.store").click(function () {
       onClickStore($(this));
+    });
+    $("div.table-organization img.in-list").click(function () {
+      onClickInLineOrganization($(this));
+    });
+    $("div.table-organization img.organizable").click(function () {
+      onClickOrganizableOrganization($(this));
     });
 </script>
 }

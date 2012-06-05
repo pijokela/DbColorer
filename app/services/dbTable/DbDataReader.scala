@@ -46,6 +46,8 @@ class DbDataReader {
     DB.withConnection { conn =>
       val tables = new ArrayBuffer[Table]()
       def createAndAdd(name : String) : Table = {
+        println();
+        println("Loading " + name + " from database.");
         val t = new Table(name)
         tables.+=(t)
         return t
@@ -53,6 +55,7 @@ class DbDataReader {
       
       val resultSet = executeSql("select table_name, column_name, column_type, color_name, tags from tables order by table_name asc, column_name asc", conn)
       while (resultSet.next()) {
+        print(".");
         val tableName = resultSet.getString(1)
         val columnName = resultSet.getString(2)
         val columnType = resultSet.getString(3)
@@ -143,10 +146,6 @@ class DbDataReader {
   }
 
   def createTable(table : JsValue) : Unit = {
-    // Make sure that the database is created:
-    dropDatabaseTables()
-    createDatabaseTables()
-    
     // Insert data from the data.txt file:
     val tableName = (table \ "name").as[String]
     println("Writing table " + tableName)

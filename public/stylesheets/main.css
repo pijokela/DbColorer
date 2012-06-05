@@ -1,5 +1,23 @@
+/* Comes from jQuery UI draggable plugin. */
+/*
+div.ui-draggable {
+	cursor: move;
+}
+*/
 body {
 	font-family: Arial, Helvetica, sans-serif;	
+}
+
+div.colorTableDiv {
+	border-style: solid;
+	border-color: blue;
+	border-width: 1px;
+}
+
+/* When the tables are dragged, they must have a maximum 
+   width so that they aren't as wide as the screen. */
+div.colorTableDiv.ui-draggable {
+	width: 20em;
 }
 
 div.left-side {
@@ -106,7 +124,6 @@ span.tag {
 	margin-left: 0.2em;
 	padding-left: 0.2em;
 	padding-right: 0.2em;
-	cursor: move;
 }
 
 /*
@@ -130,5 +147,16 @@ img.icon {
 
 div.tableList {
 	margin-left: 10em;
+}
+
+div.table-organization img {
+	cursor: default;
+	position: fixed;
+	right: 0px;
+	top: 0px;
+}
+	
+div.table-organization .not-visible {
+	visibility: collapse;
 }
 
