@@ -27,8 +27,8 @@ function onClickRow($row, column) {
 function onClickTag($tag, column) {
 	var color = $colorer_selected_color_div.attr("class");
 	if (color === "clear") {
-		removeTagFromColumn($tag, column)
-		markModified($tag.parent(), jsonRow)
+		removeTagFromColumn($tag, column);
+		markModified($tag.parent(), column);
 		return true;
 	}
 	return false;
@@ -117,8 +117,6 @@ function addTable(table) {
 			   drop: (function(column) {
 			     return function(event, ui) {
 			    	addTagToColumn($(this), column, ui.draggable); // ui.draggable is the dragged tag
-			    	// Reset the draggable back to it's place:
-			    	ui.draggable.attr("style", "position: relative;");
 			    	markModified($(this), column);
 			     }
 			   })(col)
@@ -177,7 +175,8 @@ function addTagsFromColumnToColDiv(col, $colDiv) {
 		$colDiv.append($tag);
 		$tag.on('click', (function(column) {
 			return function(event) {
-				if (onClickTag($(this), column)) {
+				var eventDone = onClickTag($(this), column);
+				if (eventDone) {
 					event.stopPropagation();
 				}
 			};
@@ -187,7 +186,12 @@ function addTagsFromColumnToColDiv(col, $colDiv) {
 
 function createTagElement(tag) {
 	var $tag = $('<span class="tag">' + tag.name + '</span>');
-	$tag.draggable();
+	$tag.draggable({
+      stop: function(event, ui) {
+    	// When drag ends, reset position back to original:
+        $(this).attr("style", "position: relative;");
+      }
+	});
 	return $tag;
 }
 
