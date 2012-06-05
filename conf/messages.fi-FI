@@ -11,8 +11,14 @@ operations.eraser=Pyyhekumi
 operations.save=Tallenna
 operations.colors=Värit
 operations.tags=Merkit
-operations.createTag=Uusi merkki
+operations.mainPage=Pääsivu
+operations.delete=Poista
+operations.create=Luo
 
 attribute.name=Nimi
 attribute.type=Tyyppi
 attribute.tables={0} taulua
+
+editTags.linkToPage=Muuta merkkejä
+editTags.listOfTagsHeading=Käytössä olevat merkit
+editTags.createTagHeading=Luo uusi merkki

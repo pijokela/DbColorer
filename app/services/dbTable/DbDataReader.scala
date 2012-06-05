@@ -159,13 +159,21 @@ class DbDataReader {
         statement.execute()
       }
     }
-    
-    // Insert test tags
+  }
+  
+  def createTag(tagName : String) {
     DB.withConnection { conn =>
-      for(tag <- List("foo", "bar", "baz")) {
-        val statement = conn.prepareStatement("INSERT INTO TAGS VALUES('" + tag + "')")
-        statement.execute()
-      }
+      val statement = conn.prepareStatement("INSERT INTO TAGS VALUES(?)")
+      statement.setString(1, tagName)
+      statement.execute()
+    }
+  }
+  
+  def removeTag(tagName : String) {
+    DB.withConnection { conn =>
+      val statement = conn.prepareStatement("DELETE FROM TAGS WHERE TAG_NAME = ?")
+      statement.setString(1, tagName)
+      statement.execute()
     }
   }
   

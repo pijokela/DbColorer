@@ -249,7 +249,7 @@ function saveJsonColorTable(table) {
     $tableDiv.removeClass("modified");
 }
 
-function onClickInLineOrganization($imageElement) {
+function switchToInLineView($imageElement) {
 	$("div.colorTableDiv").each(function (i) {
 		storeTablePositionToJsonTable($(this));
 		$(this).draggable("destroy");
@@ -260,7 +260,7 @@ function onClickInLineOrganization($imageElement) {
 	$imageElement.addClass("not-visible");
 }
 
-function onClickOrganizableOrganization($imageElement) {
+function switchToOrganizableView($imageElement) {
 	$("div.colorTableDiv").each(function (i) {
 		$(this).draggable({ handle: "h2" });
 		$(this).draggable({

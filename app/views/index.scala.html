@@ -16,7 +16,7 @@
 		<div style="clear: both"></div>
 	</div>
 	<div class="tools operations-div">
-		<div class="createTag">@Messages("operations.createTag")</div>
+		<div class="createTag"><a href="/tags">@Messages("editTags.linkToPage")</a></div>
 	</div>
 	<div class="tools operations-div">
 		<h1>@Messages("operations.others")</h1>
@@ -25,10 +25,10 @@
 	</div>
 </div>
 
-<div class="tableList">
+<div class="right-side tableList">
 	<div class="table-organization">
-	  <img class="in-list not-visible" src='@routes.Assets.at("images/tables-in-list.png")'>
-	  <img class="organizable" src='@routes.Assets.at("images/tables-draggable.png")'>
+	  <img class="in-list" src='@routes.Assets.at("images/tables-in-list.png")'>
+	  <img class="organizable not-visible" src='@routes.Assets.at("images/tables-draggable.png")'>
 	</div>
 </div>
 <script>
@@ -47,10 +47,10 @@
       onClickStore($(this));
     });
     $("div.table-organization img.in-list").click(function () {
-      onClickInLineOrganization($(this));
+    	switchToOrganizableView($(this));
     });
     $("div.table-organization img.organizable").click(function () {
-      onClickOrganizableOrganization($(this));
+    	switchToInLineView($(this));
     });
 </script>
 }

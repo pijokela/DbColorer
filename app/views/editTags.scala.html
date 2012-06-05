@@ -1,0 +1,25 @@
+@(tags: List[String])
+@main(Messages("app.title")) {
+
+<div class="left-side">
+	<div class="tools operations-div">
+		<div class="mainPage"><a href="/">@Messages("operations.mainPage")</a></div>
+	</div>
+</div>
+
+
+<div class="right-side editTagsForm">
+  <h2>@Messages("editTags.listOfTagsHeading")</h2>
+  <ul>
+  @tags.map { tag =>
+    <li><span class="tag">@tag</span><form action="/tags/delete/@tag" method="POST"><input type="submit" name='delete' value='@Messages("operations.delete")' /></form> </li>
+  }
+  </ul>
+  <h2>@Messages("editTags.createTagHeading")</h2>
+  @* TODO: This should be a POST, but how do you parse the posted id parameter from the request? *@
+  <form action="/tags/create" method="GET">
+    <input type="text" name="id" value="" />
+    <input type="submit" name='create' value='@Messages("operations.create")' />
+  </form>
+</div>
+}

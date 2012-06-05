@@ -5,6 +5,10 @@
 # Home page
 GET     /                           controllers.Application.index
 
+GET     /tags                       controllers.Application.tags
+POST    /tags/delete/:id            controllers.Application.tagsDelete(id : String)
+GET    /tags/create                controllers.Application.tagsCreate
+
 GET     /data.json                  controllers.Application.getTables
 POST    /data.json                  controllers.Application.postTables
 

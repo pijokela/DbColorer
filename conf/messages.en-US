@@ -11,8 +11,14 @@ operations.eraser=Eraser
 operations.save=Save
 operations.colors=Colors
 operations.tags=Tags
-operations.createTag=New Tag
+operations.mainPage=Main Page
+operations.delete=Remove
+operations.create=Create
 
 attribute.name=Name
 attribute.type=Type
 attribute.tables={0} tables
+
+editTags.linkToPage=Manage Tags
+editTags.listOfTagsHeading=Current Tags
+editTags.createTagHeading=Create a New Tag

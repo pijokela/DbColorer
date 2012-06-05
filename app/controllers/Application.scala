@@ -19,6 +19,22 @@ object Application extends Controller {
     Ok(views.html.index("Your new application is ready. W00t!", "myApp"))
   }
   
+  def tags = Action {
+    val jsonTags : JsObject = dbService.readTags()
+    val names = (jsonTags \\ "name").map(_.as[String]).toList
+    Ok(views.html.editTags(names))
+  }
+  
+  def tagsCreate = Action { request =>
+    dbService.createTag(request.queryString("id").head)
+    Redirect("/tags")
+  }
+  
+  def tagsDelete(id : String) = Action {
+    dbService.removeTag(id)
+    Redirect("/tags")
+  }
+  
   /*
    * The JSON sent to the browser contains an array of tables.
    */
@@ -53,9 +69,10 @@ object Application extends Controller {
     dbService.createDatabaseTables()
     
     val tables: List[JsValue] = testDataService.read()
-    tables.foreach (
-        (v : JsValue) => dbService.createTable(v)
-    )
+    tables.foreach (dbService.createTable(_))
+    
+    // Insert test tags
+    List("foo", "bar", "baz").foreach(dbService.createTag(_))
     
     Ok(Json.toJson("Data written to database!"))
   }
