@@ -2,7 +2,7 @@
 <classpath>
 	<classpathentry kind="src" output="target/scala-2.9.1/classes" path="app"/>
 	<classpathentry kind="src" output="target/scala-2.9.1/test-classes" path="test"/>
-	<classpathentry kind="var" path="PLAY_2_0/framework/sbt/boot/scala-2.9.1/lib/scala-library.jar"/>
+	<classpathentry kind="var" path="PLAY_2_0/framework/sbt/boot/scala-2.9.1/lib/scala-library.jar" sourcepath="/SCALA_SOURCES"/>
 	<classpathentry kind="var" path="PLAY_2_0/repository/local/play/play_2.9.1/2.0.1/jars/play_2.9.1.jar" sourcepath="/PLAY_2_0/framework/src"/>
 	<classpathentry kind="var" path="PLAY_2_0/repository/local/play/templates_2.9.1/2.0.1/jars/templates_2.9.1.jar"/>
 	<classpathentry kind="var" path="PLAY_2_0/repository/local/com.github.scala-incubator.io/scala-io-file_2.9.1/0.2.0/jars/scala-io-file_2.9.1.jar"/>

@@ -104,7 +104,6 @@ function addTable(table) {
 		var col = colArray[i];
 		var $tr = $('<tr><td></td></tr>');
 		var $colDiv = $('<div id="' + col.id + '" class="column ' + col.color + '">' + col.name + ' <span class="columnType">' + col.type + '</span></div>')
-		$colDiv.append(createMenuIcon(col));
 		
 		addTagsFromColumnToColDiv(col, $colDiv);
 		
@@ -122,6 +121,7 @@ function addTable(table) {
 			   })(col)
 		});
 		$tr.find('td').append($colDiv);
+		$colDiv.after(createMenuIcon(col));
 		$table.append($tr);
 	}
 	return $tableDiv;

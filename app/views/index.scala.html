@@ -22,6 +22,8 @@
 		<h1>@Messages("operations.others")</h1>
 		<div class="clear">@Messages("operations.eraser")</div>
 		<div class="store">@Messages("operations.save")</div>
+		<div class="plumb">plumb</div>
+		<div class="repaint">repaint</div>
 	</div>
 </div>
 
@@ -32,6 +34,11 @@
 	</div>
 </div>
 <script>
+    
+    jsPlumb.Defaults.Anchor = "AutoDefault";
+    jsPlumb.Defaults.LogEnabled = true;
+    jsPlumb.Defaults.DropOptions = {hoverClass: "color5"};
+    
 	$(document).ready(function() {
 		onClickColor($("div.palette-div div.color1"));
 		loadTags("@appName");
@@ -45,6 +52,16 @@
     });
     $("div.operations-div div.store").click(function () {
       onClickStore($(this));
+    });
+    $("div.operations-div div.plumb").click(function () {
+//    	jsPlumb.connect({source: $("#TOAD_PLAN_TABLE-ID"), target: $("#TABLES-TABLE_NAME"), container: $("div.tableList")});
+		var source = $("td img");
+    	jsPlumb.makeSource(source, {container: $("div.tableList"), scope: "foo"});
+    	var target = $("td div.column");
+    	jsPlumb.makeTarget(target, {container: $("div.tableList"), scope: "foo"});
+    });
+    $("div.operations-div div.repaint").click(function () {
+    	jsPlumb.repaintEverything();
     });
     $("div.table-organization img.in-list").click(function () {
     	switchToOrganizableView($(this));
