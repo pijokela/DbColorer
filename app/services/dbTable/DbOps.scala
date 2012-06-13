@@ -17,12 +17,21 @@ trait DbOps {
     }
   }
   
-  def executeSqlAndProcess[E](sql : String, fn : (ResultSet)=>E) : List[E] = {
+  def executeDelete(sql : String) : Unit = {
+    DB.withConnection { conn =>
+      val statement = conn.prepareStatement(sql)
+      if (statement.execute()) {
+        throw new RuntimeException("Delete statement returned a result set.")
+      } 
+    }
+  }
+  
+  def executeSqlAndProcess[E](sql : String, fn : (Row)=>E) : List[E] = {
     val results = new ArrayBuffer[E]()
     DB.withConnection { conn =>
       val r : ResultSet = executeSql(sql, conn)
       while (r.next()) {
-        results += fn(r)
+        results += fn(new Row(r))
       }
     }
     return results.toList
@@ -45,6 +54,11 @@ trait DbOps {
       }
 	}
   }
-  
-
 }
+
+class Row(private val rs : ResultSet) {
+  def getString( name : String ) = rs.getString( name )
+  def getInt( name : String ) = rs.getString( name )
+}
+
+

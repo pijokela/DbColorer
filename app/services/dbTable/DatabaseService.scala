@@ -102,7 +102,7 @@ class DbDataReader extends DbOps {
     val tags = executeSqlAndProcess(
         "select tag_name from tags order by tag_name asc", 
         rs => {
-          val tagName = rs.getString(1)
+          val tagName = rs.getString("tag_name")
           new JsObject(
 	        List(
 	          "id" -> Json.toJson(tagName),
@@ -130,15 +130,25 @@ class DbDataReader extends DbOps {
     return tag
   }
   
-  def writeTags(table : JsValue) : Unit = {
-/*    val tableName = (table \ "tag").as[String]
-    println("Updating table " + tableName)
+  /**
+   * Write the tags of a single database table to the 
+   * {
+   *   tags: [{id: 'myTag', name: 'myTag'}, {id: 'myTag2', name: 'myTag2'}]
+   * }
+   */
+  def writeTags(allTags : JsValue) : Unit = {
+    val tagsArray = (allTags \ "tags").asInstanceOf[JsArray]
+    val tags : List[JsObject] = tagsArray.productIterator.toList.asInstanceOf[List[JsObject]];
+    println("Updating tags " + tags.size)
+    executeDelete("DELETE FROM TAGS")
     DB.withConnection { conn =>
-      val cols = (table \ "columns").asInstanceOf[JsArray].productIterator.next().asInstanceOf[Iterable[JsObject]]
-      for(column <- cols) {
-        updateColumn(column, conn)
+      for(tag <- tags) {
+        val tagId = (tag \ "id").as[String]
+        val statement = conn.prepareStatement("INSERT INTO TAGS VALUES(?)")
+        statement.setString(1, tagId)
+        statement.execute
       }
-    }*/
+    }
   }
 
   def createTable(table : JsValue) : Unit = {
