@@ -103,16 +103,17 @@ function addTable(table) {
 	for(var i = 0; i < colArray.length; i++) {
 		var col = colArray[i];
 		var $tr = $('<tr><td></td></tr>');
-		var $colDiv = $('<div id="' + col.id + '" class="column ' + col.color + '">' + col.name + ' <span class="columnType">' + col.type + '</span></div>')
+		var $colDiv = $('<div id="' + col.id + '" class="column ' + col.color + '">' + col.name + ' <span class="columnType">' + col.type + '</span><div class="columnTags"></div></div>')
+		var $colTags = $colDiv.find("div.columnTags");
 		
-		addTagsFromColumnToColDiv(col, $colDiv);
+		addTagsFromColumnToColDiv(col, $colTags);
 		
 		$colDiv.on('click', (function(column) {
 			return function() {
 				onClickRow($(this), column);
 			};
 		})(col));
-		$colDiv.droppable({
+		$colTags.droppable({
 			   drop: (function(column) {
 			     return function(event, ui) {
 			    	addTagToColumn($(this), column, ui.draggable); // ui.draggable is the dragged tag
@@ -134,16 +135,16 @@ function addTable(table) {
  * @param column The column JSON that get the tag JSON.
  * @param $tag The tag span.
  */
-function addTagToColumn($colDiv, column, $tag) {
+function addTagToColumn($tagsDiv, column, $tag) {
 	var tag = getTagForTagSpan($tag);
 	column.tags.push(tag);
 	unique(column.tags, tagCompareFunc);
-	$colDiv.find("span.tag").remove();
-	addTagsFromColumnToColDiv(column, $colDiv)
+	$tagsDiv.find("span.tag").remove();
+	addTagsFromColumnToColDiv(column, $tagsDiv)
 }
 
 function getTagForTagSpan($tag) {
-	// TODO: This really should get the tag from the gloval variable so 
+	// TODO: This really should get the tag from the global variable so 
 	// that tags can contain more information.
 	var tag = {
 			id: $tag.html(),
@@ -167,12 +168,12 @@ function removeTagFromColumn($tag, column) {
 	$tag.remove();
 }
 
-function addTagsFromColumnToColDiv(col, $colDiv) {
+function addTagsFromColumnToColDiv(col, $tagsDiv) {
 	var tagsArray = col.tags;
 	for(var j = 0; j < tagsArray.length; j++) {
 		var tag = tagsArray[j];
 		var $tag = createTagElement(tag);
-		$colDiv.append($tag);
+		$tagsDiv.append($tag);
 		$tag.on('click', (function(column) {
 			return function(event) {
 				var eventDone = onClickTag($(this), column);
@@ -262,6 +263,10 @@ function switchToInLineView($imageElement) {
 	
 	$(".table-organization img").removeClass("not-visible");
 	$imageElement.addClass("not-visible");
+	
+	// Remove plumbing:
+	jsPlumb.removeAllEndpoints($("td img"));
+	jsPlumb.removeAllEndpoints($("td div.column"));
 }
 
 function switchToOrganizableView($imageElement) {
@@ -277,6 +282,12 @@ function switchToOrganizableView($imageElement) {
 	
 	$(".table-organization img").removeClass("not-visible");
 	$imageElement.addClass("not-visible");
+	
+	// Make columns plumbable:
+	var source = $("td img");
+	jsPlumb.makeSource(source, {container: $("div.tableList"), scope: "foo"});
+	var target = $("td div.column");
+	jsPlumb.makeTarget(target, {container: $("div.tableList"), scope: "foo"});
 }
 
 function storeTablePositionToJsonTable($tableDiv) {
