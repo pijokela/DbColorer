@@ -37,9 +37,10 @@ class TestDataReader(val fileName: String ) {
           tables.find(_.name == parts(0)).getOrElse(createAndAdd(parts(0)))
         val col = new JsObject(
             List(
+                "id" -> Json.toJson(table.name + "-" + parts(1)),
                 "name" -> Json.toJson(parts(1)),
                 "type" -> Json.toJson(parts(2)),
-                "color" -> Json.toJson(parts(3))
+                "colorId" -> Json.toJson(parts(3))
             )
         )
         table.cols.+=(col)
@@ -61,6 +62,7 @@ class Table(val name : String) {
   
   def toJson() : JsValue = {
     new JsObject(List(
+        "id" -> Json.toJson(name),
         "name" -> Json.toJson(name),
         "columns" -> new JsArray(cols)
       )

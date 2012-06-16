@@ -38,7 +38,7 @@ class SimpleDbColorerDao extends DbOps {
       val tags : List[Tag] = parseTags(resultSet.getString(5))
 
       val table : TableAndColumnsBuilder = tables.find(_.table.name == tableName).getOrElse(createAndAdd(tableName))
-      table.cols += Column(tableName + ":" + columnName, columnName, columnType, colorName, tags)
+      table.cols += Column(tableName + "-" + columnName, columnName, columnType, colorName, tags)
     }
     return tables.map(_.toTableAndColumns).toList
   }

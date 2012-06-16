@@ -28,12 +28,18 @@ case class Table(id : String, name : String, styleAttr : String) extends Jsonabl
 }
 
 object Table extends JsonableCompanion {
-  override def fromJson(json : JsValue) : Table = 
-    Table(
+  override def fromJson(json : JsValue) : Table = {
+    val styleAttr = (json \ "styleAttr") match {
+      case JsUndefined(_) => ""
+      case value => value.as[String]
+    }
+    
+    return Table(
       (json \ "id").as[String],
       (json \ "name").as[String],
-      (json \ "styleAttr").as[String]
+      styleAttr
     )
+  }
 }
 
 

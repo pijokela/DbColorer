@@ -19,7 +19,7 @@ function onClickRow($row, column) {
 	var color = $colorer_selected_color_div.attr("class");
 	$row.addClass("column");
 	$row.addClass(color);
-	column.color = color;
+	column.colorId = color;
 	
 	markModified($row, column);
 }
@@ -103,7 +103,7 @@ function addTable(table) {
 	for(var i = 0; i < colArray.length; i++) {
 		var col = colArray[i];
 		var $tr = $('<tr><td></td></tr>');
-		var $colDiv = $('<div id="' + col.id + '" class="column ' + col.color + '">' + col.name + ' <span class="columnType">' + col.type + '</span><div class="columnTags"></div></div>')
+		var $colDiv = $('<div id="' + col.id + '" class="column ' + col.colorId + '">' + col.name + ' <span class="columnType">' + col.type + '</span><div class="columnTags"></div></div>')
 		var $colTags = $colDiv.find("div.columnTags");
 		
 		addTagsFromColumnToColDiv(col, $colTags);
