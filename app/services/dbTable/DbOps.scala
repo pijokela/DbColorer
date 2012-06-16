@@ -8,7 +8,7 @@ import scala.collection.mutable.ArrayBuffer
 
 trait DbOps {
 
-  def executeSql(sql : String, conn : Connection) : ResultSet = {
+  def executeSql(sql : String)(implicit conn : Connection) : ResultSet = {
     val statement = conn.prepareStatement(sql)
     if (statement.execute()) {
       statement.getResultSet()
@@ -26,13 +26,11 @@ trait DbOps {
     }
   }
   
-  def executeSqlAndProcess[E](sql : String, fn : (Row)=>E) : List[E] = {
+  def executeSqlAndProcess[E](sql : String, fn : (Row)=>E)(implicit conn : Connection) : List[E] = {
     val results = new ArrayBuffer[E]()
-    DB.withConnection { conn =>
-      val r : ResultSet = executeSql(sql, conn)
-      while (r.next()) {
-        results += fn(new Row(r))
-      }
+    val r : ResultSet = executeSql(sql)
+    while (r.next()) {
+      results += fn(new Row(r))
     }
     return results.toList
   }

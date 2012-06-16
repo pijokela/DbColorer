@@ -3,7 +3,7 @@ package services
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
 import play.api.libs.json.JsValue
-import play.api.libs.json.JsArray
+import play.api.libs.json._
 
 trait Jsonable {
   def toJson() : JsObject
@@ -50,17 +50,32 @@ case class Column(id : String, name : String, colType : String, colorId : String
 	  "tags" -> new JsArray(tags.map(_.toJson))
     )
   )
+  
+  /**
+   * Create a tag id string for a column.
+   */
+  def writeTagIdString() : String = {
+    return tags.map(_.id).mkString(" ")
+  }
+  
 }
 
 object Column extends JsonableCompanion {
-  override def fromJson(json : JsValue) : Column = 
+  override def fromJson(json : JsValue) : Column = {
+    val tagsR = (json \ "tags")
+    val tags = tagsR match {
+      case JsUndefined(_) => new JsArray(List())
+      case array => tagsR.asInstanceOf[JsArray]
+    }
+    
     Column(
       (json \ "id").as[String],
       (json \ "name").as[String],
       (json \ "type").as[String],
       (json \ "colorId").as[String],
-      Tag.fromJsonArray((json \ "tags").asInstanceOf[JsArray])
+      Tag.fromJsonArray(tags)
     )
+  }
     
   def fromJsonArray(colsArray : JsArray) : List[Column] = 
     colsArray.value.map(Column.fromJson(_)).toList
@@ -76,6 +91,7 @@ case class TableAndColumns(table : Table, columns : List[Column]) extends Jsonab
     table.toJson ++ 
       new JsObject(List("columns" -> new JsArray(columns.map(_.toJson))))
 
+  def tableName() : String = table.name
 }
 
 object TableAndColumns extends JsonableCompanion {
@@ -108,6 +124,9 @@ object Tag extends JsonableCompanion {
   
   def fromJsonArray(tagsArray : JsArray) : List[Tag] = 
     tagsArray.value.map(Tag.fromJson(_)).toList
+    
+  def toJsonArray(tags : List[Tag]) : JsArray = 
+    new JsArray(tags.map(_.toJson))
 }
 
 

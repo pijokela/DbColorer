@@ -3,6 +3,7 @@ package services
 import org.junit.Test
 import play.api.libs.json.JsObject
 import org.junit.Assert._
+import play.api.libs.json.Json
 
 class DomainJsonTests {
 
@@ -38,6 +39,19 @@ class DomainJsonTests {
     jsonRoundTripTest(colWithTag, Column)
   }
   
+  /*
+   * The javascript layer should be allowed to return columns that 
+   * do not write an empty array for no tags.
+   */
+  @Test
+  def aColumnWithTagsAttributeMissingShouldProduceAndReadJson() {
+    val jsonStr = """{"id":"myid","name":"myname","type":"a1","colorId":"a2"}"""
+    val col = Column.fromJson(Json.parse(jsonStr))
+    assertNotNull(col)
+    assertTrue(col.tags.isEmpty)
+  }
+  
+  
   @Test
   def aTableAndColumnsShouldProduceAndReadJson() {
     val tAndC = new TableAndColumns(table, colWithTag :: Nil)
@@ -47,6 +61,7 @@ class DomainJsonTests {
   private def jsonRoundTripTest(tag : Jsonable, comp : JsonableCompanion) : Unit = {
     val json : JsObject = tag.toJson
     assertNotNull(json)
+    println(json)
     val tag2 = comp.fromJson(json)
     assertNotNull(tag2)
     assertEquals(tag, tag2)

@@ -6,6 +6,7 @@ import play.api.libs.json._
 import com.codahale.jerkson.Json._
 import services.testTable.TestDataReader
 import services.dbTable._
+import services._
 import scala.collection.mutable.ArrayBuffer
 import play.api.i18n.Messages
 import play.api.i18n.Lang
@@ -27,7 +28,11 @@ object Application extends Controller {
   }
   
   def tagsCreate = Action { request =>
-    dbService.createTag(request.queryString("id").head)
+    // TODO: I need to look at the Play form handling 
+    // documentation to see how this should be done.
+    val tagId = request.queryString("id").head
+    val tag = Tag(tagId, tagId)
+    dbService.createTag(tag)
     Redirect("/tags")
   }
   
@@ -66,14 +71,14 @@ object Application extends Controller {
    */
   def createTestData = Action {
     // Make sure that the database is created:
-    dbService.dropDatabaseTables()
-    dbService.createDatabaseTables()
+    dbService.recreateDatabase()
     
     val tables: List[JsValue] = testDataService.read()
     tables.foreach (dbService.createTable(_))
     
     // Insert test tags
-    List("foo", "bar", "baz").foreach(dbService.createTag(_))
+    List(("foo" -> "foo"), ("bar" -> "bar"), ("baz" -> "baz"))
+      .foreach((arg)=>dbService.createTag(Tag(arg._1,arg._2)))
     
     Ok(Json.toJson("Data written to database!"))
   }

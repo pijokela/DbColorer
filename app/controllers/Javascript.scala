@@ -5,7 +5,6 @@ import play.api.mvc._
 import play.api.libs.json._
 import com.codahale.jerkson.Json._
 import services.testTable.TestDataReader
-import services.dbTable.DbDataReader
 import scala.collection.mutable.ArrayBuffer
 import play.api.i18n.Messages
 import play.api.i18n.Lang
