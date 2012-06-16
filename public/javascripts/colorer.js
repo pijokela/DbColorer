@@ -21,14 +21,14 @@ function onClickRow($row, column) {
 	$row.addClass(color);
 	column.colorId = color;
 	
-	markModified($row, column);
+	markColumnModified($row, column);
 }
 
 function onClickTag($tag, column) {
 	var color = $colorer_selected_color_div.attr("class");
 	if (color === "clear") {
 		removeTagFromColumn($tag, column);
-		markModified($tag.parent(), column);
+		markColumnModified($tag.parent(), column);
 		return true;
 	}
 	return false;
@@ -37,8 +37,12 @@ function onClickTag($tag, column) {
 /*
  * Marks the table modified in the UI and data structure.
  */
-function markModified($row, jsonRow) {
+function markColumnModified($row, jsonRow) {
 	var $tableDiv = $row.parents("div.colorTableDiv");
+	markTableModified($tableDiv);
+}
+
+function markTableModified($tableDiv) {
 	$tableDiv.addClass("modified");
 }
 
@@ -93,7 +97,7 @@ function addTable(table) {
     });
 	
 	var $tableDiv = $(
-			'<div id="' + table.id + '" class="colorTableDiv"><A name="' + table.id + '"><h2>' + table.name + ' </h2></a>' +
+			'<div id="' + table.id + '" class="colorTableDiv"><A name="' + table.id + '"><h2><span class="drag-indicator"> </span> ' + table.name + ' <span class="drag-indicator"> </span></h2></a>' +
 			'<table class="colorTable"></table></div>');
 	
 	$tableDiv.find('h2').append($saveSpan);
@@ -117,7 +121,7 @@ function addTable(table) {
 			   drop: (function(column) {
 			     return function(event, ui) {
 			    	addTagToColumn($(this), column, ui.draggable); // ui.draggable is the dragged tag
-			    	markModified($(this), column);
+			    	markColumnModified($(this), column);
 			     }
 			   })(col)
 		});
@@ -275,6 +279,7 @@ function switchToOrganizableView($imageElement) {
 		$(this).draggable({
 			stop: function(event, ui) {
 				storeTablePositionToJsonTable($(this));
+				markTableModified($(this));
 			}
 		});
 		loadTablePositionToJsonTable($(this));
@@ -292,13 +297,18 @@ function switchToOrganizableView($imageElement) {
 
 function storeTablePositionToJsonTable($tableDiv) {
 	var table = findJsonTable($tableDiv);
-	table.style = $tableDiv.attr("style");
+	table.styleAttr = $tableDiv.attr("style");
 }
 
 function loadTablePositionToJsonTable($tableDiv) {
 	var table = findJsonTable($tableDiv);
-	if (table.style !== undefined && table.style !== null)
-		$tableDiv.attr("style", table.style);
+	var value = table.styleAttr;
+	if (value !== undefined && value !== null) {
+		// The style will not work unless it contains the 'position: relative' part:
+		if (value.indexOf("position: relative") !== -1) {
+			$tableDiv.attr("style", value);
+		}
+	}
 }
 
 

@@ -1,6 +1,26 @@
+/* Indicators that appear when something is draggable */
+span.drag-indicator {
+	visibility: collapse;
+}
+
+div.ui-draggable h2 span.drag-indicator {
+	cursor: move;
+	visibility: visible;
+	background-image:url('/assets/images/drag-bg.png');
+	padding-left: 0.5em;
+	padding-right: 0.5em;
+	margin-left: 0.2em;
+	margin-right: 0.2em;
+}
+
 /* Comes from jQuery UI draggable plugin. */
 div.ui-draggable h2 {
 	cursor: move;
+/*	-moz-border-radius: 0.5em;
+	border-radius: 0.5em;
+	margin: 0.4em;
+	background-color: #DDDDDD;
+	*/
 }
 
 body {
@@ -113,7 +133,8 @@ div.column {
 
 div.columnTags {
     min-width: 3em;
-    min-height: 1.6em;
+    min-height: 1.4em;
+    padding: 0.1em;
     background-color: #CCCCCC;
 /*    opacity: 0.2;*/
 }

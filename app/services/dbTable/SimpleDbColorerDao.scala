@@ -18,29 +18,31 @@ class SimpleDbColorerDao extends DbOps {
     }
   }
 
+  private def readTables(implicit conn : Connection) : List[Table] =
+    executeSqlAndProcess("select name, style_attr from tables order by name asc",
+      (row) => Table(
+        row.getString("name"), // Use name as id
+        row.getString("name"),
+        row.getString("style_attr")
+      )
+    )
+  
+  private def readColumnsForTable(tableId : String)(implicit conn : Connection) : List[Column] =
+    executeSqlAndProcess("""
+        select column_name, column_type, color_name, tags 
+          from columns where table_name = '""" + tableId + """' order by column_name asc
+        """,
+      (row) => Column(
+        tableId + "-" + row.getString("column_name"),
+        row.getString("column_name"),
+        row.getString("column_type"),
+        row.getString("color_name"),
+        parseTags(row.getString("tags"))
+      )
+    )
+  
   def read(implicit conn : Connection) : List[TableAndColumns] = {
-    val tables = new ArrayBuffer[TableAndColumnsBuilder]()
-    def createAndAdd(name : String) : TableAndColumnsBuilder = {
-      println();
-      println("Loading " + name + " from database.");
-      val t = new TableAndColumnsBuilder(name)
-      tables.+=(t)
-      return t
-    }
-
-    val resultSet = executeSql("select table_name, column_name, column_type, color_name, tags from tables order by table_name asc, column_name asc")
-    while (resultSet.next()) {
-      print(".");
-      val tableName = resultSet.getString(1)
-      val columnName = resultSet.getString(2)
-      val columnType = resultSet.getString(3)
-      val colorName = resultSet.getString(4)
-      val tags : List[Tag] = parseTags(resultSet.getString(5))
-
-      val table : TableAndColumnsBuilder = tables.find(_.table.name == tableName).getOrElse(createAndAdd(tableName))
-      table.cols += Column(tableName + "-" + columnName, columnName, columnType, colorName, tags)
-    }
-    return tables.map(_.toTableAndColumns).toList
+    readTables.map((t)=>TableAndColumns(t, readColumnsForTable(t.id)))
   }
 
   def readTag(tagId : String)(implicit conn : Connection) : Tag = {
@@ -60,11 +62,19 @@ class SimpleDbColorerDao extends DbOps {
   }
 
   def updateColumn(col : Column)(implicit conn : Connection) : Unit = {
-    val statement = conn.prepareStatement("UPDATE TABLES SET color_name = ?, tags = ? WHERE TABLE_NAME = ? AND COLUMN_NAME = ?")
+    val statement = conn.prepareStatement("UPDATE COLUMNS SET color_name = ?, tags = ? WHERE TABLE_NAME = ? AND COLUMN_NAME = ?")
     statement.setString(1, col.colorId)
     statement.setString(2, col.writeTagIdString())
     statement.setString(3, col.id.split("-")(0))
     statement.setString(4, col.id.split("-")(1))
+    val result = statement.executeUpdate()
+  }
+
+  def updateTable(table : Table)(implicit conn : Connection) : Unit = {
+    val statement = conn.prepareStatement("UPDATE TABLES SET STYLE_ATTR = ?, tags = ? WHERE NAME = ?")
+    statement.setString(1, table.styleAttr)
+    statement.setString(2, "")
+    statement.setString(3, table.id)
     val result = statement.executeUpdate()
   }
 
@@ -90,18 +100,35 @@ class SimpleDbColorerDao extends DbOps {
 
   def insertTableAndColumns(tableAndCols : TableAndColumns)(implicit conn : Connection) {
     val t = tableAndCols.table
-    for(c <- tableAndCols.columns) {
+    insertTable(t)
+    tableAndCols.columns.foreach(insertColumn(t, _))
+  }
+  
+  private def insertColumn(table : Table, column : Column)(implicit conn : Connection) {
       val statement = conn.prepareStatement(
-          "INSERT INTO TABLES VALUES(?, ?, ?, ?, '')")
-      statement.setString(1, t.name)
-      statement.setString(2, c.name)
-      statement.setString(3, c.colType)
-      statement.setString(4, c.colorId)
+          "INSERT INTO COLUMNS VALUES(?, ?, ?, ?, ?)")
+      statement.setString(1, table.id)
+      statement.setString(2, column.name)
+      statement.setString(3, column.colType)
+      statement.setString(4, column.colorId)
+      statement.setString(5, column.writeTagIdString)
       statement.execute()
-    }
+  }
+
+  private def insertTable(table : Table)(implicit conn : Connection) {
+      val statement = conn.prepareStatement(
+          "INSERT INTO TABLES VALUES(?, ?, ?)")
+      statement.setString(1, table.name)
+      statement.setString(2, table.styleAttr)
+      statement.setString(3, "")
+      statement.execute()
   }
 
   def dropDatabaseTables() {
+    createTable(
+      "drop table columns", 
+      "Cannot drop table columns, maybe it is already dropped? "
+    )
     createTable(
       "drop table tables", 
       "Cannot drop table tables, maybe it is already dropped? "
@@ -114,11 +141,33 @@ class SimpleDbColorerDao extends DbOps {
   
   def createDatabaseTables() {
     createTable(
-      "create table tables (table_name varchar(255), column_name varchar(255), column_type varchar(255), color_name varchar(255), tags varchar(2000))", 
+      """
+        create table columns (
+          table_name varchar(255), 
+          column_name varchar(255), 
+          column_type varchar(255), 
+          color_name varchar(255), 
+          tags varchar(2000)
+        )
+      """, 
+      "Cannot create table columns, maybe it is already created? "
+    )
+    createTable(
+      """
+        create table tables (
+          name varchar(255), 
+          style_attr varchar(4000), 
+          tags varchar(2000)
+        )
+      """, 
       "Cannot create table tables, maybe it is already created? "
     )
     createTable(
-      "create table tags (tag_name varchar(255))", 
+      """
+        create table tags (
+          tag_name varchar(255)
+        )
+      """, 
       "Cannot create table tags, maybe it is already created? "
     )
   }

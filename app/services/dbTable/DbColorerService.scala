@@ -37,6 +37,7 @@ class DbColorerService(val dao : SimpleDbColorerDao) extends DbOps {
     val tableAndCols = TableAndColumns.fromJson(tableJson)
     println("Updating table " + tableAndCols.tableName)
     DB.withConnection { implicit conn =>
+      dao.updateTable(tableAndCols.table)
       val cols = tableAndCols.columns
       for(column <- cols) {
         dao.updateColumn(column)

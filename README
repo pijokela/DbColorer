@@ -1,0 +1,8 @@
+What is DbColorer?
+==================
+
+DbColorer allows you to categorize something like database columns
+with colors. The project is also my first Scala Play 2 project, so
+there will be some mistakes in the project structure early on.
+
+This file is packaged in to the "play dist" ZIP archive.
