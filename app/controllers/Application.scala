@@ -5,14 +5,15 @@ import play.api.mvc._
 import play.api.libs.json._
 import com.codahale.jerkson.Json._
 import services.testTable.TestDataReader
-import services.dbTable.DbDataReader
+import services.dbTable._
 import scala.collection.mutable.ArrayBuffer
 import play.api.i18n.Messages
 import play.api.i18n.Lang
 
 object Application extends Controller {
   
-  val dbService : DbDataReader = new DbDataReader() // new TestDataReader("data.txt")
+  val colorerDao : SimpleDbColorerDao = new SimpleDbColorerDao()
+  val dbService : DbColorerService = new DbColorerService(colorerDao) // new TestDataReader("data.txt")
   val testDataService : TestDataReader = new TestDataReader("data.txt")
   
   def index = Action {

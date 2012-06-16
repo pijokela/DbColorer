@@ -17,7 +17,7 @@ import org.h2.jdbc.JdbcSQLException
  * access class must also manipulate them and currently they are
  * created from table and column names.
  */
-class DbDataReader extends DbOps {
+class DbColorerService(val dao : SimpleDbColorerDao) extends DbOps {
 
   /**
    * Parse a String to a JsArray allowing for empty strings.
