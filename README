@@ -24,5 +24,17 @@ DbColorer is very much in progress .. so this is not polished.
    This will create the H2 database with some data.
 7. Go to "http://localhost:9000/".
 
+Development
+===========
+
 I use Eclipse with Scala IDE for editing and some of the Eclipse files are 
-in the repo.
+in the repo. The idea is that the files should be usable for anybody working
+with DbColorer.
+
+1. Create an eclipse variable called PLAY_2_0 and point it to the directory
+you got from unzipping Play. This will make the classpaths work.
+2. Download the scala sources as a .tgz from 
+3. Convert the .tgz to a .zip
+4. Create and eclipse variable called SCALA_SOURCES and point it to the
+ZIP file you just got. This will make Scala source navigation work - many
+of the Scala IDE features will not work without it.
