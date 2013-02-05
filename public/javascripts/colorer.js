@@ -106,7 +106,7 @@ function addTable(table) {
 	var colArray = table.columns;
 	for(var i = 0; i < colArray.length; i++) {
 		var col = colArray[i];
-		var $tr = $('<tr><td></td></tr>');
+		var $tr = $('<tr><td class="data"></td><td class="plumb"><img class="plumb icon" src="/assets/images/dots.png"></td></tr>');
 		var $colDiv = $('<div id="' + col.id + '" class="column ' + col.colorId + '">' + col.name + ' <span class="columnType">' + col.type + '</span><div class="columnTags"></div></div>')
 		var $colTags = $colDiv.find("div.columnTags");
 		
@@ -125,8 +125,8 @@ function addTable(table) {
 			     }
 			   })(col)
 		});
-		$tr.find('td').append($colDiv);
-		$colDiv.after(createMenuIcon(col));
+		$tr.find('td.data').append($colDiv);
+//		$colDiv.after(createMenuIcon(col));
 		$table.append($tr);
 	}
 	return $tableDiv;
@@ -206,7 +206,7 @@ function createTagElement(tag) {
  * @param col The column JSON object.
  * @returns A JQuery img tag.
  */
-function createMenuIcon(col) {
+/*function createMenuIcon(col) {
 	var $icon = $('<img class="icon" src="/assets/images/ratas.png">');
 	$icon.on('click', (function(column) {
 		return function() {
@@ -214,7 +214,7 @@ function createMenuIcon(col) {
 		};
 	})(col));
 	return $icon;
-}
+}*/
 
 function loadData(appName) {
 	// Assign handlers immediately after making the request,
@@ -259,6 +259,9 @@ function saveJsonColorTable(table) {
 }
 
 function switchToInLineView($imageElement) {
+	$("body").addClass("inline-view");
+	$("body").removeClass("organizable-view");
+	
 	$("div.colorTableDiv").each(function (i) {
 		storeTablePositionToJsonTable($(this));
 		$(this).draggable("destroy");
@@ -269,17 +272,22 @@ function switchToInLineView($imageElement) {
 	$imageElement.addClass("not-visible");
 	
 	// Remove plumbing:
-	jsPlumb.removeAllEndpoints($("td img"));
-	jsPlumb.removeAllEndpoints($("td div.column"));
+	jsPlumb.removeAllEndpoints($("img.plumb"));
+	jsPlumb.removeAllEndpoints($("td.data div.column"));
+	jsPlumb.repaintEverything();
 }
 
 function switchToOrganizableView($imageElement) {
+	$("body").removeClass("inline-view");
+	$("body").addClass("organizable-view");
+	
 	$("div.colorTableDiv").each(function (i) {
 		$(this).draggable({ handle: "h2" });
 		$(this).draggable({
 			stop: function(event, ui) {
 				storeTablePositionToJsonTable($(this));
 				markTableModified($(this));
+				callAfterDragAndDrop();
 			}
 		});
 		loadTablePositionToJsonTable($(this));
@@ -289,10 +297,18 @@ function switchToOrganizableView($imageElement) {
 	$imageElement.addClass("not-visible");
 	
 	// Make columns plumbable:
-	var source = $("td img");
+	var source = $("img.plumb");
 	jsPlumb.makeSource(source, {container: $("div.tableList"), scope: "foo"});
-	var target = $("td div.column");
+	var target = $("td.data div.column");
 	jsPlumb.makeTarget(target, {container: $("div.tableList"), scope: "foo"});
+	jsPlumb.repaintEverything();
+}
+
+/**
+ * Collect and DnD cleanup here.
+ */
+function callAfterDragAndDrop() {
+    jsPlumb.repaintEverything();
 }
 
 function storeTablePositionToJsonTable($tableDiv) {
@@ -345,11 +361,17 @@ function unique(a, compareFunc){
     return a;
 }
 
+/**
+ * @return Compare s1 and s2 like Java compareTo method.
+ */
 function stringCompareFunc(s1, s2) {
   if (s1 === s2) return 0;
   return (s1 < s2) ? 1 : -1;
 }
 
+/**
+ * @return Compare t1 and t2 like Java compareTo method.
+ */
 function tagCompareFunc(t1, t2) {
   return stringCompareFunc(t1.id, t2.id);
 }

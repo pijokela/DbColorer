@@ -3,6 +3,13 @@ span.drag-indicator {
 	visibility: collapse;
 }
 
+/**
+ * Keep the table heading lines on a single line 
+ */
+h2 {
+  white-space: pre;
+}
+
 div.ui-draggable h2 span.drag-indicator {
 	cursor: move;
 	visibility: visible;
@@ -19,8 +26,7 @@ div.ui-draggable h2 {
 /*	-moz-border-radius: 0.5em;
 	border-radius: 0.5em;
 	margin: 0.4em;
-	background-color: #DDDDDD;
-	*/
+	background-color: #DDDDDD;*/
 }
 
 body {
@@ -60,9 +66,19 @@ span.saveTable {
 	font-weight: bolder; 
 }
 
-div.modified {
-	border-style: dashed;
-	border-width: 0px 0px 0px 0.3em;	
+/*
+ * Table border when not modified
+ */
+div.colorTableDiv {
+	border-style: dotted;
+	border-width: 0px 0px 0px 1em;
+	border-color: grey; /* #E5E5E5; */
+}
+
+/*
+ * Table border when table has been modified
+ */
+div.colorTableDiv.modified {
 	border-color: red;	
 }
 
@@ -166,9 +182,32 @@ span.columnType {
 	opacity: 0.7;
 }
 
+td.plumb {
+    margin: 0px;
+    padding: 0px;
+}
+
+img.icon.plumb {
+    padding-top: 0.5em;
+}
+
 img.icon {
 	float: right;
 	width: 1.2em;	
+}
+
+/*
+ * Hide plumbing icons in inline view.
+ */
+body.inline-view td.plumb {
+    display: none;
+}
+
+/*
+ * Show plumbing icons in ornigazable view.
+ */
+body.organizable-view td.plumb {
+    display: block;
 }
 
 div.right-side {
