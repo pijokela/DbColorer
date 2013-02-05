@@ -11,6 +11,9 @@ How to run?
 DbColorer is very much in progress .. so this is not polished.
 
 1. Get Play 2.0.1 (or newer, I hope)
+  - http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html
+  - http://www.scala-lang.org/downloads
+  - http://www.playframework.org/download
 2. Clone the repo
 3. Go to the project directory
 4. "play"
